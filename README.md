@@ -105,6 +105,10 @@ Available parameters:
 | DISKS_{X}\_PARTITION_{Y}\_MOUNT_POINT | Path of the mount point |
 | DISKS_{X}\_PARTITION_{Y}\_MKFS_EXTRA_PARAM | Extra parameters to pass to mkfs or mkswap, by default -U is already passed and can't be specified again |
 
+Legend:
+- {X} is an index starting from 0 and indicates the disk index in the configuration
+- {Y} is an index starting from 0 and indicates the partition index for the related disk in the configuration
+
 ### keep-vt-logs-console
 
 Avoids clearing the tty1 after the boot is completed, handy to see any error if a screen is attached or to read the system info printed by the **print-info** module.
@@ -170,6 +174,10 @@ Available parameters:
 | USER_{X}_GROUPS                   | Additional user groups (comma separated, no whitespaces!) |
 | USER_{X}_ADD_CREATE_OPTS_OVERRIDE | Override ALL the create options (to specificy different home, comments, etc.) |
 | USER_{X}_SSH_AUTH_KEYS_{Y}        | Pre-authorised ssh keys |
+
+Legend:
+- {X} is an index starting from 0 and indicates the user index in the configuration
+- {Y} is an index starting from 0 and indicates the ssh auth key index for the related user in the configuration
 
 ### print-info
 
