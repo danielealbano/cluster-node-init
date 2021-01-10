@@ -13,19 +13,19 @@ With this approach, and thanks to this cloud-init simplified replacement, a sing
 Only Ubuntu 20.10 64bit has been tested so far but should work safely on Ubuntu 20.04 and also on Raspbian, both 32bit and 64bit.
 
 A number of modules are already available
-- remove-cloud-init
-- hostname-configure
-- disks-configure
-- keep-vt-logs-console
-- network-configure
-- apt-configure
-- apt-update
-- apt-upgrade
-- apt-install-packages
-- apparmor-disable
-- sshd-configure
-- users-configure
-- print-info
+- [remove-cloud-init](remove-cloud-init)
+- [hostname-configure](hostname-configure)
+- [disks-configure](disks-configure)
+- [keep-vt-logs-console](keep-vt-logs-console)
+- [network-configure](network-configure)
+- [apt-configure](apt-configure)
+- [apt-update](apt-update)
+- [apt-upgrade](apt-upgrade)
+- [apt-install-packages](apt-install-packages)
+- [apparmor-disable](apparmor-disable)
+- [sshd-configure](sshd-configure)
+- [users-configure](users-configure)
+- [print-info](print-info)
 
 A few modules still need to be implemented
 - apt-configure
