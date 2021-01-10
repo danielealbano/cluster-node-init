@@ -8,9 +8,11 @@ The resource constraint, the slowness and the extreme **instability** of cloud-i
 My cluster boots entirely via PXE and TFTP and the rootfs is an overlayfs virtual filesystem exported via NFS, because I have built this platform with that in mind the configuration is a file available on the disk of the node. Currently it's not possible to fetch the configuration from an external system but will be added soon.
 Also, the goal of this platform is to let me to destroy any node any time, simply deleting the rootfs folder on the storage of the master node, and rebuild it automatically with zero effort therefore some operations (like system updates, package installation, etc.) are performed on every boot although the platform aims to be idempotent therefore is a safe operation.
 
-With this approach, and thanks to this cloud-init simplified replacement, a single node can be bootstrapped with already the updates installed in the base image and it takes <90s for the first boot and 40-ish seconds afterwards.
+With this approach, and thanks to this cloud-init simplified replacement, a single node can be fully bootstrapped with already the updates installed in the base image and it takes <90s for the first boot and 40-ish seconds afterwards.
 
 Only Ubuntu 20.10 64bit has been tested so far but should work safely on Ubuntu 20.04 and also on Raspbian, both 32bit and 64bit.
+
+This approach comes handy also for embedded / IoT devices, it makes possible to have a cloud-init configuration approach with a minimal enviroment available (ie. a buildroot / yocto based system where you want to retain the flexibility to run a set of steps at boot to perform the auto-configuration).
 
 A number of modules are already available
 - [remove-cloud-init](#remove-cloud-init)
@@ -32,7 +34,8 @@ A few modules still need to be implemented
 - network-configure
 - snap-install-packages
 - timezone-configure
-- ntp-configure 
+- ntp-configure
+- run-custom
 
 Because the network-configure module is a WIP, the deploy mechanism relies on a network configurable via DHCP on eth0, as per default on the raspberry pi. The wifi auto configuration hasn't been tested and most likely it will not work.
 
@@ -40,7 +43,9 @@ An [example configuration](#example-configuration) is available in the documenta
 
 ## Installation
 
-Although this the platform has been built with a rootfs over nfs, it can be easily installed directly on the disk:
+### Current machine
+
+Although this the platform has been built with a rootfs over nfs, it can be easily installed directly on a machine:
 ```
 cd /opt
 sudo git clone https://github.com/danielealbano/cluster-node-init.git
@@ -51,7 +56,23 @@ sudo ln -s /opt/cluster-node-init/cluster-node-init.service /etc/systemd/system/
 sudo systemctl daemon-reload
 ```
 
-These instructions can easily be adapted to deploy cluster-node-init over rootfs exported via fs, just use relative paths, ie.
+### rootfs via a sdcard
+
+If you have flashed an sdcard you can mount the rootfs and run the following commands
+```
+cd path/to/sdcard/rootfs
+cd opt
+sudo git clone https://github.com/danielealbano/cluster-node-init.git
+sudo cp opt/cluster-node-init/config.env.skel opt/cluster-node-init/config.env
+sudo nano opt/cluster-node-init/config.env # update the config as needed
+sudo mkdir ../etc/systemd/system/multi-user.target.wants
+cd ../etc/systemd/system/multi-user.target.wants
+sudo ln -s ../../opt/cluster-node-init/cluster-node-init.service cluster-node-init.service
+```
+
+### rootfs exported over NFS
+
+The instructions are really similar to the ones used for the sdcard
 ```
 cd path/to/rootfs/over/nfs
 cd opt
@@ -432,8 +453,8 @@ Jan 10 00:06:20 localhost cluster-node-init.sh[2335]: [Sun Jan 10 00:06:20 2021]
 Jan 10 00:06:20 localhost cluster-node-init.sh[2335]: [Sun Jan 10 00:06:20 2021][INFO][print-info]
 Jan 10 00:06:20 localhost cluster-node-init.sh[2335]: [Sun Jan 10 00:06:20 2021][INFO][print-info] IP Address(es)
 Jan 10 00:06:20 localhost cluster-node-init.sh[2335]: [Sun Jan 10 00:06:20 2021][INFO][print-info] > eth0
-Jan 10 00:06:20 localhost cluster-node-init.sh[2335]: [Sun Jan 10 00:06:20 2021][INFO][print-info] bin boot dev etc home lib media mnt opt proc root run sbin scripts snap srv sys tmp usr var 192.168.255.115/24
-Jan 10 00:06:20 localhost cluster-node-init.sh[2335]: [Sun Jan 10 00:06:20 2021][INFO][print-info] bin boot dev etc home lib media mnt opt proc root run sbin scripts snap srv sys tmp usr var fe80::dea6:32ff:fec3:c14/64
+Jan 10 00:06:20 localhost cluster-node-init.sh[2335]: [Sun Jan 10 00:06:20 2021][INFO][print-info] * 192.168.255.115/24
+Jan 10 00:06:20 localhost cluster-node-init.sh[2335]: [Sun Jan 10 00:06:20 2021][INFO][print-info] * fe80::dea6:32ff:fec3:c14/64
 Jan 10 00:06:20 localhost cluster-node-init.sh[2335]: [Sun Jan 10 00:06:20 2021][INFO][print-info]
 Jan 10 00:06:20 localhost cluster-node-init.sh[2335]: [Sun Jan 10 00:06:20 2021][INFO][print-info] SSH host keys
 Jan 10 00:06:20 localhost cluster-node-init.sh[2335]: [Sun Jan 10 00:06:20 2021][INFO][print-info] > ssh_host_ecdsa_key.pub
