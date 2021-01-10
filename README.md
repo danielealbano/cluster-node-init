@@ -33,7 +33,6 @@ A number of modules are already available
 A few modules still need to be implemented
 - apt-configure
 - network-configure
-- snap-install-packages
 - timezone-configure
 - ntp-configure
 - run-custom
@@ -252,8 +251,7 @@ A skeleton config file named [config.env.skel](config.env.skel) is available in 
 MODULE_LIST=""
 MODULE_LIST="${MODULE_LIST} remove-cloud-init hostname-configure disks-configure timezone-configure keep-vt-logs-console"
 MODULE_LIST="${MODULE_LIST} network-configure apt-configure apt-update apt-upgrade apt-install-packages"
-MODULE_LIST="${MODULE_LIST} snap-install-packages ntp-configure apparmor-disable sshd-configure users-configure"
-MODULE_LIST="${MODULE_LIST} print-info"
+MODULE_LIST="${MODULE_LIST} ntp-configure apparmor-disable sshd-configure users-configure print-info"
 MODULE_EXECUTION_MAX_RETRIES=3
 MODULE_EXECUTION_MAX_RETRY_WAIT_IN_SECONDS=5
 
