@@ -26,6 +26,11 @@ CLUSTER_NODE_INIT_DIR=$(dirname $0)
 
 . ${CLUSTER_NODE_INIT_DIR}/functions.sh
 
+if systemd_is_invocation_id_available;
+then
+    log_disable_timestamp
+fi
+
 BASH_CMD="/bin/bash"
 
 # cluster node init variables
@@ -121,6 +126,7 @@ do
             . ${CLUSTER_NODE_INIT_DIR}/functions.sh
             . ${CONFIG_PATH}
             LOG_MESSAGE_PREFIX="${LOG_MESSAGE_PREFIX}"
+            LOG_MESSAGE_SKIP_TIMESTAMP="${LOG_MESSAGE_SKIP_TIMESTAMP}"
             $(cat $MODULE_PATH)
 TRY
         MODULE_EXIT_CODE=$?

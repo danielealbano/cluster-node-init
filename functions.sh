@@ -1,11 +1,32 @@
 LOG_MESSAGE_PREFIX=""
+LOG_MESSAGE_SKIP_TIMESTAMP=0
+
+function systemd_is_invocation_id_available() {
+    if [ ! -z "${INVOCATION_ID}" ];
+    then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function log_disable_timestamp() {
+    LOG_MESSAGE_SKIP_TIMESTAMP=1
+}
 
 function log_message() {
     local LEVEL="$1"
     shift
     local MESSAGE="$@"
+    local MESSAGE_PREFIX=""
+    
+    if [ ${LOG_MESSAGE_SKIP_TIMESTAMP} == 0 ];
+    then
+        MESSAGE_PREFIX="[$(date +%c)]"
+    fi
 
-    local MESSAGE_PREFIX="[$(date +%c)][${LEVEL}]"
+    MESSAGE_PREFIX="${MESSAGE_PREFIX}[${LEVEL}]"
+
     if [ ! -z "${LOG_MESSAGE_PREFIX}" ];
     then
         local MESSAGE_PREFIX="${MESSAGE_PREFIX}[${LOG_MESSAGE_PREFIX}]"
