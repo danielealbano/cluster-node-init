@@ -1,0 +1,14 @@
+[Unit]
+Description=cluster-node-init
+After=network.target
+Before=sshd.service getty@tty1.service
+
+[Service]
+Type=oneshot
+StandardError=journal+console
+StandardOutput=journal+console
+ExecStart=/opt/cluster-node-init/cluster-node-init.sh -m /opt/cluster-node-init/modules.d -c /opt/cluster-node-init/config.env
+TimeoutSec=3600
+
+[Install]
+WantedBy=multi-user.target
