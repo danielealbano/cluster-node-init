@@ -32,6 +32,28 @@ function fstab_has_partition_uuid() {
     fi
 }
 
+function swap_is_activated() {
+    local SWAP_DEV=$1
+
+    if grep -qs "${SWAP_DEV} " /proc/swaps 2>&1 >/dev/null;
+    then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function partition_device_is_mounted() {
+    local DISK_PARTITION_DEV=$1
+
+    if grep -qs "${DISK_PARTITION_DEV} " /proc/mounts 2>&1 >/dev/null;
+    then
+        return 0
+    else
+        return 1
+    fi
+}
+
 
 LOOP_INDEX=-1
 while [ true ];
@@ -164,24 +186,20 @@ do
             log_i "/etc/fstab already contains a record for <${DISK_PARTITION_DEV}> with UUID <${DISK_PARTITION_UUID}>, skipping"
         fi
 
-        # If the partitions creation hasn't been skipped try to mount them / activate the swap
-        if [ ${DISK_PARTITIONS_SKIPPED} == 0 ];
+        # Mount the new swap / filesystem
+        if [ "${DISK_PARTITION_FS}" = "swap" ];
         then
-            # Mount the new swap / filesystem
-            if [ "${DISK_PARTITION_FS}" = "swap" ];
+            if ! swap_is_activated "${DISK_PARTITION_DEV}";
             then
                 log_i "Activating swap for <${DISK_PARTITION_DEV}> with UUID <${DISK_PARTITION_UUID}>"
-                if ! swapon "UUID=${DISK_PARTITION_UUID}" >/dev/null;
-                then
-                    fatal "Failed to activate the swap, unable to continue"
-                fi
+                swapon "UUID=${DISK_PARTITION_UUID}" >/dev/null
                 log_i "Swap activated"
-            else
+            fi
+        else
+            if ! partition_device_is_mounted "${DISK_PARTITION_DEV}";
+            then
                 log_i "Mounting <${DISK_PARTITION_MOUNT_POINT}> with UUID <${DISK_PARTITION_UUID}>"
-                if ! mount "UUID=${DISK_PARTITION_UUID}" >/dev/null;
-                then
-                    fatal "Failed to mount the volume, unable to continue"
-                fi
+                mount "UUID=${DISK_PARTITION_UUID}" >/dev/null
                 log_i "Mounted"
             fi
         fi
