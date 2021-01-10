@@ -1,6 +1,3 @@
-. /opt/cluster-node-init/config.env
-. /opt/cluster-node-init/functions.sh
-
 # PRECONFIGURATION
 # ---
 # useradd -m -c "microk8s - remote add node user" -G microk8s microk8s-remote-add-node-user
