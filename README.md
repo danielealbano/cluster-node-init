@@ -36,8 +36,7 @@ A few modules still need to be implemented
 
 Because the network-configure module is a WIP, the deploy mechanism relies on a network configurable via DHCP on eth0, as per default on the raspberry pi. The wifi auto configuration hasn't been tested and most likely it will not work.
 
-Please take a look at [config.env.skel](config.env.skel) for the configuration parameters, keep in mind that this file is sourced by the main bash script and therefore can contain actual commands.
-On a longer term the goal is to support something more convenient like YAML.
+An [example configuration](#example-configuration) is available in the documentation and also in the repository, keep in mind that this file is sourced by the main bash script and therefore can contain actual commands. On a longer term the goal is to support something more convenient like YAML.
 
 ## Installation
 
