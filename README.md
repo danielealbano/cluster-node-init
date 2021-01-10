@@ -27,6 +27,7 @@ A number of modules are already available
 - [apparmor-disable](#apparmor-disable)
 - [sshd-configure](#sshd-configure)
 - [users-configure](#users-configure)
+- [microk8s-join-configure](#microk8s-join-configure)
 - [print-info](#print-info)
 
 A few modules still need to be implemented
@@ -200,6 +201,37 @@ Legend:
 - {X} is an index starting from 0 and indicates the user index in the configuration
 - {Y} is an index starting from 0 and indicates the ssh auth key index for the related user in the configuration
 
+### microk8s-join-configure
+
+Install microk8s, disable ha-cluster and join the node to a cluster.
+
+It requires an use to login from the worker node onto the master node via ssh, below the instructions.
+
+Preconfiguration, to run on the master, it will:
+- create an user called microk8s-remote-add-node-user
+- create an ssh key storing it in microk8s-remote-add-node-user-key and microk8s-remote-add-node-user-key.pub
+- updating the authorized_keys of the newly created user
+- print out the config parameter MICROK8S_JOIN_REMOTE_USER_SSH_KEY_BASE64
+```
+useradd -m -c "microk8s - remote add node user" -G microk8s microk8s-remote-add-node-user
+ssh-keygen -fmicrok8s-remote-add-node-user-key -t ed25519 -b 2096 -C "microk8s-remote-add-node-user-key@$(hostname)" -q -N ''
+mkdir ~microk8s-remote-add-node-user/.ssh
+chown microk8s-remote-add-node-user.microk8s-remote-add-node-user ~microk8s-remote-add-node-user/.ssh
+chmod 700 ~microk8s-remote-add-node-user/.ssh
+cp microk8s-remote-add-node-user-key.pub ~microk8s-remote-add-node-user/.ssh/authorized_keys
+chown microk8s-remote-add-node-user.microk8s-remote-add-node-user ~microk8s-remote-add-node-user/.ssh/authorized_keys
+chmod 600 ~microk8s-remote-add-node-user/.ssh/authorized_keys
+echo "MICROK8S_JOIN_REMOTE_USER_SSH_KEY_BASE64=\"$(cat microk8s-remote-add-node-user-key | base64 -w0)\""
+```
+
+Available parameters:
+
+| Parameter | Details |
+| - | - |
+| MICROK8S_JOIN_REMOTE_USER | User to use to access the master node via ssh (ie. microk8s-remote-add-node-user) |
+| MICROK8S_JOIN_MASTER_HOSTNAME | Microk8s master node hostname (or ip address) |
+| MICROK8S_JOIN_REMOTE_USER_SSH_KEY_BASE64 | Base64-encode private key used for remote access from the worker node to the master node |
+
 ### print-info
 
 Prints out the node ip address(es), hostname and ssh host keys for reference.
@@ -308,6 +340,34 @@ USER_0_GROUP=""
 USER_0_GROUPS="adm,audio,cdrom,dialout,dip,floppy,lxd,netdev,plugdev,sudo,video"
 USER_0_ADD_CREATE_OPTS_OVERRIDE=""
 USER_0_SSH_AUTH_KEYS_0="__YOUR_SSH_PUB_KEY__"
+
+
+# microk8s-join-configure
+# ---
+# MICROK8S_JOIN_REMOTE_USER
+# MICROK8S_JOIN_MASTER_HOSTNAME
+# MICROK8S_JOIN_REMOTE_USER_SSH_KEY_BASE64
+# ---
+# PRECONFIGURATION (on master node)
+# ---
+# useradd -m -c "microk8s - remote add node user" -G microk8s microk8s-remote-add-node-user
+# ssh-keygen -fmicrok8s-remote-add-node-user-key -t ed25519 -b 2096 -C "microk8s-remote-add-node-user-key@$(hostname)" -q -N ''
+# mkdir ~microk8s-remote-add-node-user/.ssh
+# chown microk8s-remote-add-node-user.microk8s-remote-add-node-user ~microk8s-remote-add-node-user/.ssh
+# chmod 700 ~microk8s-remote-add-node-user/.ssh
+# cp microk8s-remote-add-node-user-key.pub ~microk8s-remote-add-node-user/.ssh/authorized_keys
+# chown microk8s-remote-add-node-user.microk8s-remote-add-node-user ~microk8s-remote-add-node-user/.ssh/authorized_keys
+# chmod 600 ~microk8s-remote-add-node-user/.ssh/authorized_keys
+#
+# Update the configuration as follow
+# MICROK8S_JOIN_REMOTE_USER to microk8s-remote-add-node-user
+# MICROK8S_JOIN_MASTER_HOSTNAME to __MASTER_NODE_HOSTNAME__
+# MICROK8S_JOIN_REMOTE_USER_SSH_KEY_BASE64 to $(cat microk8s-remote-add-node-user-key | base64 -w0)
+
+# 
+MICROK8S_JOIN_REMOTE_USER=""
+MICROK8S_JOIN_MASTER_HOSTNAME=""
+MICROK8S_JOIN_REMOTE_USER_SSH_KEY_BASE64=""
 ```
 
 ## Example logs
