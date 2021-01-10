@@ -63,8 +63,8 @@ If you have flashed an sdcard you can mount the rootfs and run the following com
 cd path/to/sdcard/rootfs
 cd opt
 sudo git clone https://github.com/danielealbano/cluster-node-init.git
-sudo cp opt/cluster-node-init/config.env.skel opt/cluster-node-init/config.env
-sudo nano opt/cluster-node-init/config.env # update the config as needed
+sudo cp cluster-node-init/config.env.skel cluster-node-init/config.env
+sudo nano cluster-node-init/config.env # update the config as needed
 sudo mkdir ../etc/systemd/system/multi-user.target.wants
 cd ../etc/systemd/system/multi-user.target.wants
 sudo ln -s ../../opt/cluster-node-init/cluster-node-init.service cluster-node-init.service
